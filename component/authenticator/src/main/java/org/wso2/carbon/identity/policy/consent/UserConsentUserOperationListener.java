@@ -52,11 +52,11 @@ public class UserConsentUserOperationListener extends AbstractUserOperationEvent
             throws UserStoreException {
         Map<String, String> claimMap = new HashMap<String, String>();
         long timestamp = System.currentTimeMillis();
-        claimMap.put(UserConsentUtils.LAST_PASSWORD_CHANGED_TIMESTAMP_CLAIM, Long.toString(timestamp));
+        claimMap.put(UserConsentUtils.USER_CONSENT_CLAIM, Long.toString(timestamp));
         userStoreManager.setUserClaimValues(userName, claimMap, null);
         if (log.isDebugEnabled()) {
-            log.debug("The claim uri" + UserConsentUtils.LAST_PASSWORD_CHANGED_TIMESTAMP_CLAIM + "of " + userName
-                    + " updated with the current timestamp");
+            log.debug("The claim uri" + UserConsentUtils.USER_CONSENT_CLAIM + "of " + userName
+                    + " updated with the user consent");
         }
         return true;
     }
@@ -73,11 +73,11 @@ public class UserConsentUserOperationListener extends AbstractUserOperationEvent
             throws UserStoreException {
         Map<String, String> claimMap = new HashMap<String, String>();
         long timestamp = System.currentTimeMillis();
-        claimMap.put(UserConsentUtils.LAST_PASSWORD_CHANGED_TIMESTAMP_CLAIM, Long.toString(timestamp));
+        claimMap.put(UserConsentUtils.USER_CONSENT_CLAIM, Long.toString(timestamp));
         userStoreManager.setUserClaimValues(userName, claimMap, null);
         if (log.isDebugEnabled()) {
-            log.debug("The claim uri " + UserConsentUtils.LAST_PASSWORD_CHANGED_TIMESTAMP_CLAIM + "of " + userName
-                    + " updated with the current timestamp");
+            log.debug("The claim uri " + UserConsentUtils.USER_CONSENT_CLAIM + "of " + userName
+                    + " updated with the user consent");
         }
         return true;
     }

@@ -55,13 +55,30 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>WSO2 Identity Server</title>
+        <title>Ellucian Ethos Identity</title>
 
         <link rel="icon" href="images/favicon.png" type="image/x-icon"/>
         <link href="libs/bootstrap_3.3.5/css/bootstrap.min.css" rel="stylesheet">
         <link href="css/Roboto.css" rel="stylesheet">
         <link href="css/custom-common.css" rel="stylesheet">
+        <link href="/authenticationendpoint/ellucian/index.css" rel="stylesheet">
 
+    <style>
+    .wrapper .logo {
+        height: 25px;
+    }
+
+    .wrapper img {
+        height: auto;
+    }
+
+    .wrapper .u2f {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    </style>
+
+		
         <script src="js/scripts.js"></script>
         <script src="assets/js/jquery-1.7.1.min.js"></script>
         <!--[if lt IE 9]>
@@ -78,9 +95,9 @@
         <div class="container-fluid">
             <div class="pull-left brand float-remove-xs text-center-xs">
                 <a href="#">
-                    <img src="images/logo-inverse.svg" alt="wso2" title="wso2" class="logo">
+                    <img src="="/authenticationendpoint/ellucian/ellucian-logo.png" alt="ellucian" title="ellucian" class="logo">
 
-                    <h1><em>Identity Server</em></h1>
+                    <h1><em>Ellucian Ethos Identity</em></h1>
                 </a>
             </div>
         </div>
@@ -96,7 +113,7 @@
                 <div class="container col-xs-10 col-sm-6 col-md-6 col-lg-4 col-centered wr-content wr-login col-centered">
                     <div>
                         <h2 class="wr-title blue-bg padding-double white boarder-bottom-blue margin-none">
-                            Change your password &nbsp;&nbsp;
+                            Please consent to the site's terms and conditions &nbsp;&nbsp;
                     </div>
                     <div class="boarder-all ">
                         <div class="clearfix"></div>
@@ -135,20 +152,16 @@
                    value='<%=request.getParameter("sessionDataKey")%>'/>
                  <div class='col-md-12 form-group'>
                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 form-group">
-                           <input id="userConsent" name="USER_CONSENT" type="checkbox" class="form-control" tabindex="0"
-                                  placeholder="I consent to the terms and conditions">
+This is where the consent text needs to go. It actually needs to be a reference to text that is stored in a property file so that it can be modified easily. 
+
                        </div>
-                       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 form-group">
-                           <input id="newPassword" name="NEW_PWD" type="password" class="form-control"
-                                  placeholder="New Password">
-                          </div>
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 form-group">
-                           <input id="repeatPassword" name="NEW_PWD_CONFIRMATION" type="password" class="form-control"
-                                  placeholder="Repeat Password">
+                           <input id="repeatPassword" name="USER_CONSENT" type="text" class="form-control"
+                                  placeholder="I accept the Terms and Conditions">
                             </div>
                             <div class='form-row'>
                                <div class='col-md-12 form-group'>
-                                 <button class='form-control btn btn-primary submit-button' type='submit' onclick="$('#loading').show();">Change password</button>
+                                 <button class='form-control btn btn-primary submit-button' type='submit' onclick="$('#loading').show();">Continue</button>
                                </div>
                         </div>
 
@@ -171,9 +184,9 @@
     <!-- footer -->
     <footer class="footer">
         <div class="container-fluid">
-            <p>WSO2 Identity Server | &copy;
+            <p>Ellucian Ethos Identity | &copy;
                 <script>document.write(new Date().getFullYear());</script>
-                <a href="http://wso2.com/" target="_blank"><i class="icon fw fw-wso2"></i> Inc</a>. All Rights Reserved.
+                <a href="http://ellucian.com/" target="_blank"><i class="icon fw fw-wso2"></i> Inc</a>. All Rights Reserved.
             </p>
         </div>
     </footer>

@@ -83,9 +83,7 @@ public class UserConsentEnforcerOnExpiration extends AbstractApplicationAuthenti
         if (context.isLogoutRequest()) {
             return AuthenticatorFlowStatus.SUCCESS_COMPLETED;
         }
-        if (StringUtils.isNotEmpty(request.getParameter(UserConsentEnforceConstants.CURRENT_PWD))
-                && StringUtils.isNotEmpty(request.getParameter(UserConsentEnforceConstants.NEW_PWD))
-                && StringUtils.isNotEmpty(request.getParameter(UserConsentEnforceConstants.NEW_PWD_CONFIRMATION))) {
+        if (StringUtils.isNotEmpty(request.getParameter(UserConsentEnforceConstants.USER_CONSENT)) {
             try {
                 processAuthenticationResponse(request, response, context);
             } catch (Exception e) {
@@ -100,8 +98,7 @@ public class UserConsentEnforcerOnExpiration extends AbstractApplicationAuthenti
     }
 
     /**
-     * this will prompt user to change the credentials only if the last password
-     * changed time has gone beyond the pre-configured value.
+     * this will prompt user to consent to the terms and conditions if they have not already
      *
      * @param request  the request
      * @param response the response
@@ -116,10 +113,10 @@ public class UserConsentEnforcerOnExpiration extends AbstractApplicationAuthenti
         int tenantId;
         String tenantAwareUsername;
         String fullyQualifiedUsername;
-        long passwordChangedTime = 0;
-        int daysDifference = 0;
-        String passwordLastChangedTime;
-        long currentTimeMillis;
+//        long passwordChangedTime = 0;
+//        int daysDifference = 0;
+        String userConsent;
+//        long currentTimeMillis;
 
         // find the authenticated user.
         AuthenticatedUser authenticatedUser = getUsername(context);
@@ -142,26 +139,26 @@ public class UserConsentEnforcerOnExpiration extends AbstractApplicationAuthenti
         } catch (UserStoreException e) {
             throw new AuthenticationFailedException("Error occurred while loading user manager from user realm", e);
         }
-        currentTimeMillis = System.currentTimeMillis();
+//        currentTimeMillis = System.currentTimeMillis();
         try {
-            passwordLastChangedTime = userStoreManager.getUserClaimValue(tenantAwareUsername,
-                    UserConsentUtils.LAST_PASSWORD_CHANGED_TIMESTAMP_CLAIM, null);
+            userConsent = userStoreManager.getUserClaimValue(tenantAwareUsername,
+                    UserConsentUtils.USER_CONSENT_CLAIM, null);
         } catch (org.wso2.carbon.user.core.UserStoreException e) {
             throw new AuthenticationFailedException("Error occurred while loading user claim - "
-                    + UserConsentUtils.LAST_PASSWORD_CHANGED_TIMESTAMP_CLAIM, e);
+                    + UserConsentUtils.USER_CONSENT_CLAIM, e);
         }
-        if (passwordLastChangedTime != null) {
-            passwordChangedTime = Long.parseLong(passwordLastChangedTime);
-        }
-        if (passwordChangedTime > 0) {
-            Calendar currentTime = Calendar.getInstance();
-            currentTime.add(Calendar.DATE, (int) currentTime.getTimeInMillis());
-            daysDifference = (int) ((currentTimeMillis - passwordChangedTime) / (1000 * 60 * 60 * 24));
-        }
-        if (daysDifference > UserConsentUtils.getPasswordExpirationInDays() || passwordLastChangedTime == null) {
-            // the password has changed or the password changed time is not set.
+//        if (passwordLastChangedTime != null) {
+//            passwordChangedTime = Long.parseLong(passwordLastChangedTime);
+//        }
+//        if (passwordChangedTime > 0) {
+//            Calendar currentTime = Calendar.getInstance();
+//            currentTime.add(Calendar.DATE, (int) currentTime.getTimeInMillis());
+//            daysDifference = (int) ((currentTimeMillis - passwordChangedTime) / (1000 * 60 * 60 * 24));
+//        }
+        if (userConsent == null) {
+            // the user has not consented to the terms and conditions, so display the Terms and Conditions Consent page.
             String loginPage = ConfigurationFacade.getInstance().getAuthenticationEndpointURL().replace("login.do",
-                    "pwd-reset.jsp");
+                    "user-consent.jsp");
             String queryParams = FrameworkUtils.getQueryStringWithFrameworkContextId(context.getQueryParams(),
                     context.getCallerSessionKey(), context.getContextIdentifier());
             try {
@@ -185,7 +182,7 @@ public class UserConsentEnforcerOnExpiration extends AbstractApplicationAuthenti
     }
 
     /**
-     * Update the updateCredential.
+     * Update the userConsent claim.
      *
      * @param request  the request
      * @param response the response
@@ -194,9 +191,9 @@ public class UserConsentEnforcerOnExpiration extends AbstractApplicationAuthenti
     @Override
     protected void processAuthenticationResponse(HttpServletRequest request, HttpServletResponse response,
                                                  AuthenticationContext context) throws AuthenticationFailedException {
-        String currentPassword;
-        String newPassword;
-        String repeatPassword;
+//        String currentPassword;
+//        String newPassword;
+        String consentToTerms;
         AuthenticatedUser authenticatedUser = getUsername(context);
         String username = authenticatedUser.getAuthenticatedSubjectIdentifier();
         String tenantDomain = authenticatedUser.getTenantDomain();
@@ -212,28 +209,28 @@ public class UserConsentEnforcerOnExpiration extends AbstractApplicationAuthenti
         } catch (UserStoreException e) {
             throw new AuthenticationFailedException("Error occurred while loading user realm or user store manager", e);
         }
-        currentPassword = request.getParameter(UserConsentEnforceConstants.CURRENT_PWD);
-        newPassword = request.getParameter(UserConsentEnforceConstants.NEW_PWD);
-        repeatPassword = request.getParameter(UserConsentEnforceConstants.NEW_PWD_CONFIRMATION);
-        if (currentPassword == null || newPassword == null || repeatPassword == null) {
-            throw new AuthenticationFailedException("All fields are required");
-        }
-        if (currentPassword.equals(newPassword)) {
-            throw new AuthenticationFailedException("This is your old password,please provide a new password");
-        }
-        if (newPassword.equals(repeatPassword)) {
-            try {
-                userStoreManager.updateCredential(tenantAwareUsername, newPassword, currentPassword);
-                if (log.isDebugEnabled()) {
-                    log.debug("Updated user credentials of " + tenantAwareUsername);
-                }
-            } catch (org.wso2.carbon.user.core.UserStoreException e) {
-                throw new AuthenticationFailedException("Incorrect current password", e);
-            }
+        consentToTerms = request.getParameter(UserConsentEnforceConstants.USER_CONSENT);
+//        newPassword = request.getParameter(UserConsentEnforceConstants.NEW_PWD);
+//        repeatPassword = request.getParameter(UserConsentEnforceConstants.NEW_PWD_CONFIRMATION);
+        if (consentToTerms == null) {
+//            throw new AuthenticationFailedException("All fields are required");
+//        }
+//        if (currentPassword.equals(newPassword)) {
+//            throw new AuthenticationFailedException("This is your old password,please provide a new password");
+//        }
+//        if (newPassword.equals(repeatPassword)) {
+//            try {
+//                userStoreManager.updateCredential(tenantAwareUsername, newPassword, currentPassword);
+//                if (log.isDebugEnabled()) {
+//                    log.debug("Updated user credentials of " + tenantAwareUsername);
+//                }
+//            } catch (org.wso2.carbon.user.core.UserStoreException e) {
+//                throw new AuthenticationFailedException("Incorrect current password", e);
+//            }
             // authentication is now completed in this step. update the authenticated user information.
             updateAuthenticatedUserInStepConfig(context, authenticatedUser);
-        } else {
-            throw new AuthenticationFailedException("New password does not match with the new password confirmation");
+//        } else {
+            throw new AuthenticationFailedException("You have not consented to the site's terms and conditions");
         }
     }
 
